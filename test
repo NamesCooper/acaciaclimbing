@@ -1,0 +1,94 @@
+<template>
+<div class="w-full h-full">
+<!-- Map container -->
+<div id="crag-map" class="w-full h-[600px] rounded-2xl shadow"></div>
+
+
+<!-- Sidebar / Info Panel (optional) -->
+<div v-if="selectedCrag" class="mt-4 p-4 rounded-2xl shadow bg-white">
+<h2 class="text-xl font-semibold mb-2">{{ selectedCrag.name }}</h2>
+<ul>
+<li v-for="area in selectedCrag.areas" :key="area.id">
+<div class="flex justify-between">
+<span>{{ area.name }}</span>
+<span>{{ area.completeness }}%</span>
+</div>
+<div class="w-full bg-gray-200 h-2 rounded">
+<div
+class="h-2 bg-green-500 rounded"
+:style="{ width: area.completeness + '%' }"
+></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</template>
+
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+
+
+// Example placeholder data. In your real use case, fetch from API or content files.
+const crags = [
+{
+id: 1,
+name: 'Mt Coolum',
+lat: -26.555,
+lng: 153.095,
+zoom: 15,
+areas: [
+{ id: 1, name: 'Main Cave', completeness: 80 },
+{ id: 2, name: 'Left Wall', completeness: 45 },
+{ id: 3, name: 'Boulders', completeness: 10 }
+]
+},
+{
+id: 2,
+name: 'Glasshouse Mountains',
+lat: -26.901,
+lng: 152.951,
+zoom: 13,
+areas: [
+{ id: 1, name: 'Ngungun', completeness: 52 },
+{ id: 2, name: 'Tibro Slabs', completeness: 70 }
+]
+}
+]
+
+
+const map = ref(null)
+const selectedCrag = ref(null)
+
+
+onMounted(() => {
+map.value = L.map('crag-map').setView([-26.7, 153.0], 10)
+
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+maxZoom: 19,
+}).addTo(map.value)
+
+
+// Add clickable crag markers
+crags.forEach(crag => {
+const marker = L.marker([crag.lat, crag.lng]).addTo(map.value)
+marker.on('click', () => {
+map.value.flyTo([crag.lat, crag.lng], crag.zoom, {
+duration: 1.2
+})
+selectedCrag.value = crag
+})
+})
+})
+</script>
+
+
+<style>
+#crag-map {
+height: 600px;
+}
+</style>
