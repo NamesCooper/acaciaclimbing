@@ -23,6 +23,11 @@ npx nuxi generate
 npx serve ./.output/public
 ```
 
+Notes on GitHub Actions permissions:
+
+- The workflow uses the automatically provided `GITHUB_TOKEN` to push the built site to the `gh-pages` branch. The workflow sets `permissions: contents: write` so the token can push. If you have branch protection rules blocking pushes to `gh-pages`, you'll need to allow the `github-actions` app or adjust protection rules so the action can publish.
+
+
 # pnpm
 pnpm install
 
